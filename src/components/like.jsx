@@ -13,8 +13,20 @@ export default function Like ({ likes, onLikeOrUnlike, dataType }) {
 			</button>
 			<span>
 				{userLikes ?
-					`You and ${likes.length - 1} other people like this ${dataType}` :
-					`${likes.length} people like this ${dataType}`
+					<>
+						{likes.length === 1 ?
+							`You like this ${dataType}` :
+							`You and ${likes.length - 1} other
+							${likes.length > 2 ? 'people like' : 'person likes'} this ${dataType}`
+						}
+					</>
+					:
+					<>
+						{likes.length === 1 ?
+							`1 person likes this ${dataType}` :
+							`${likes.length} people like this ${dataType}`
+						}
+					</>
 				}
 			</span>
 		</StyledLike>

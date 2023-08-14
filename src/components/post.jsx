@@ -31,7 +31,7 @@ export default function Post ({ postData, refreshPosts }) {
 				<PostHeader data={postData} />
 				<PostBody text={postData.text} image={postData.image} />
 				<PostLikes postLikes={postData.likes} postId={postData._id} />
-				<PostComments postComments={postData.comments} postId={postData.id} />
+				<PostComments postComments={postData.comments} postId={postData._id} />
 				{user.id === postData.user.id &&
 					<DeleteButton onClick={() => setShowConfirm(true)}>Delete Post</DeleteButton>
 				}
