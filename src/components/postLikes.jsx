@@ -30,18 +30,14 @@ export default function PostLikes ({ postLikes, postId }) {
 		<Container>
 			<Like likes={likes} dataType='post' onLikeOrUnlike={handleLike}/>
 			<p>
-				{likes.slice(0, 3).map((likingUser, index) => {
-					return (
-						<Fragment key={likingUser.id}>
-							<SimpleLink key={likingUser.id} to={`/user/${likingUser.id}`}>
-								{likingUser.id === user.id ? 'You' : likingUser.fullname}
-							</SimpleLink>
-							{index < 2 && index < likes.length - 2 &&
-								<span>, </span>
-							}
-						</Fragment>
-					)
-				})}
+				{likes.slice(0, 3).map((likingUser, index) =>
+					<Fragment key={likingUser.id}>
+						<SimpleLink key={likingUser.id} to={`/user/${likingUser.id}`}>
+							{likingUser.id === user.id ? 'You' : likingUser.fullname}
+						</SimpleLink>
+						{index < 2 && index < likes.length - 1 && <span>, </span>}
+					</Fragment>
+				)}
 				{likes.length > 0 &&
 					<>
 						<span>{` and ${Math.max(0, likes.length - 3)} `}</span>
