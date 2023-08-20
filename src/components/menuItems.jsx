@@ -6,6 +6,15 @@ import { headerBlue } from '../styles/sharedComponentStyles'
 import friendsIcon from '../assets/friends.svg'
 import notificationsIcon from '../assets/notifications.svg'
 import notificationsPendingIcon from '../assets/notifications-pending.svg'
+import chatIcon from '../assets/chat.svg'
+
+export function ChatIcon () {
+	return (
+		<Link to='/chat'>
+			<HeaderIcon src={chatIcon} alt='' />
+		</Link>
+	)
+}
 
 export function Friends ({ showDropdown, setShowDropdown }) {
 	const { user, acceptFriendRequest, rejectFriendRequest } = useAuth()
@@ -14,7 +23,7 @@ export function Friends ({ showDropdown, setShowDropdown }) {
 	return (
 		<MenuItemContainer>
 			<button aria-label='Incoming friend requests' className='icon-button' onClick={setShowDropdown}>
-				<img src={friendsIcon} alt='' />
+				<HeaderIcon src={friendsIcon} alt='' />
 				{hasItems && <span>{hasItems}</span>}
 			</button>
 			{showDropdown &&
@@ -54,7 +63,7 @@ export function Notifications ({ showDropdown, setShowDropdown }) {
 	return (
 		<MenuItemContainer>
 			<button aria-label='unread notifications' className='icon-button' onClick={setShowDropdown}>
-				<img src={hasItems ? notificationsPendingIcon : notificationsIcon} alt='' />
+				<HeaderIcon src={hasItems ? notificationsPendingIcon : notificationsIcon} alt='' />
 				{hasItems && <span>{hasItems}</span>}
 			</button>
 			{showDropdown &&
@@ -85,13 +94,13 @@ export function Notifications ({ showDropdown, setShowDropdown }) {
 	)
 }
 
+const HeaderIcon = styled.img`
+	width: 32px;
+	filter: invert(100%);
+	&:hover { filter: invert(85%); }
+`
+
 const MenuItemContainer = styled.div`
-	img {
-		width: 32px;
-		padding-right: 4px;
-		filter: invert(100%);
-		&:hover { filter: invert(85%); }
-	}
 	button span {
 		color: #fff
 	}

@@ -55,10 +55,35 @@ export function Badge ({ userData, style }) {
 	)
 }
 
+export function BadgeWithStatus ({ userData, style }) {
+	return (
+		<BadgeWithStatusContainer style={style}>
+			<UserIcon profilePicture={userData.profilePicture} size='96px'/>
+			<div>
+				<p to={'/user/' + userData.id}>{userData.fullname}</p>
+				<Status $online={userData.isOnline }>{userData.isOnline ? 'Online' : 'Offline'}</Status>
+			</div>
+		</BadgeWithStatusContainer>
+	)
+}
+
 const Icon = styled.img`
 	width: ${({ $size }) => $size ? $size : '24px'};
 	height: ${({ $size }) => $size ? $size : '24px'};
 	border-radius: 50%;
+`
+
+const BadgeWithStatusContainer = styled.div`
+	display: flex;
+	gap: 15px;
+	align-items: center;
+	p { margin: 10px; }
+`
+
+const Status = styled.p`
+	font-size: 80%;
+	font-weight: 600;
+	color: ${props => props.$online ? 'green' : 'grey' }
 `
 
 const UserBadgeContainer = styled.div`

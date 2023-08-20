@@ -30,9 +30,30 @@ export function AuthProvider ({ children }) {
 		if (!token) return
 		const socket = io(import.meta.env.VITE_SERVER, { auth: { token } })
 
-		// Incoming message
+		// Incoming messages
 		socket.on('userUpdate', userDocument => setUser(userDocument))
-		socket.on('message', value => console.log(value))
+		socket.on('message', message => console.log('SOCKET SERVER:', message))
+		socket.on('friendStatusUpdate', status => () => {
+			setUser(currentUser => {
+				console.log('friendStatusUpdate', status)
+				const updatedFriends = currentUser.friends.map(friend => {
+					if (friend.id === status.id) {
+						return {
+							...friend,
+							isOnline: status.isOnline
+						}
+					} else {
+						return friend
+					}
+				})
+
+				return {
+					...currentUser,
+					friends: updatedFriends
+				}
+			})
+			// sendNotification() // TODO
+		})
 
 		// TESTING
 		// document.addEventListener('keydown', e => {

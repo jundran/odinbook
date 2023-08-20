@@ -3,9 +3,9 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import useAuth from '../context/authContext'
 import { UserBadge } from './userComponents'
-import { Friends, Notifications } from './menuItems'
+import { Friends, Notifications, ChatIcon } from './menuItems'
 import { Hamburger, MobileMenu } from './mobileMenu'
-import { headerBlue, DESKTOP, MOBILE_SMALL } from '../styles/sharedComponentStyles'
+import { headerBlue, DESKTOP, MOBILE } from '../styles/sharedComponentStyles'
 
 export default function Header () {
 	const [showDropdown, setShowDropdown] = useState(false)
@@ -26,6 +26,7 @@ export default function Header () {
 					<Hamburger showMenu={showMenu} setShowMenu={() => setShowMenu(!showMenu)}/>
 					<Right>
 						{user && <>
+							<ChatIcon />
 							<Friends showDropdown={showDropdown === 'notifications'}
 								setShowDropdown={() => setShowDropdown(
 									showDropdown === 'notifications' ? '' : 'notifications')
@@ -81,5 +82,5 @@ const Left = styled.div`
 const Right = styled.div`
 	justify-content: flex-end;
 	gap: 10px;
-	@media (max-width: ${MOBILE_SMALL}) { gap: 0px; }
+	@media (max-width: ${MOBILE}) { gap: 0px; }
 `
