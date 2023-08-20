@@ -33,11 +33,14 @@ export function AuthProvider ({ children }) {
 		// Incoming messages
 		socket.on('userUpdate', userDocument => setUser(userDocument))
 		socket.on('message', message => console.log('SOCKET SERVER:', message))
-		socket.on('friendStatusUpdate', status => () => {
+		socket.on('friendStatusUpdate', status =>
 			setUser(currentUser => {
 				console.log('friendStatusUpdate', status)
+				let updatedFriend = null
+
 				const updatedFriends = currentUser.friends.map(friend => {
 					if (friend.id === status.id) {
+						updatedFriend = friend
 						return {
 							...friend,
 							isOnline: status.isOnline
@@ -47,13 +50,20 @@ export function AuthProvider ({ children }) {
 					}
 				})
 
+				const notification = {
+					type: 'friend-update',
+					user: updatedFriend,
+					message: status.isOnline ? ' came online' : ' went offline',
+					createdAt: new Date()
+				}
+
 				return {
 					...currentUser,
-					friends: updatedFriends
+					friends: updatedFriends,
+					notifications: [...currentUser.notifications, notification]
 				}
 			})
-			// sendNotification() // TODO
-		})
+		)
 
 		// TESTING
 		// document.addEventListener('keydown', e => {

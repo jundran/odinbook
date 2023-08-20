@@ -69,7 +69,7 @@ export function Notifications ({ showDropdown, setShowDropdown }) {
 			{showDropdown &&
 				<DropdownContainer>
 					<DropdownTitle>Notifications</DropdownTitle>
-					<Items> {/* toReversed() returns copy in reverse order */}
+					<Items> {/* toReversed() returns copy of the array */}
 						{user.notifications.toReversed().map(notification =>
 							<Item key={notification._id}>
 								<p>
