@@ -71,7 +71,7 @@ export function Notifications ({ showDropdown, setShowDropdown }) {
 					<DropdownTitle>Notifications</DropdownTitle>
 					<Items> {/* toReversed() returns copy of the array */}
 						{user.notifications.toReversed().map(notification =>
-							<Item key={notification._id}>
+							<Item key={notification.id || notification._id}>
 								<p>
 									{notification.user &&
 										<Link to={`/user/${notification.user.id}`}>{notification.user.fullname}</Link>
@@ -80,7 +80,7 @@ export function Notifications ({ showDropdown, setShowDropdown }) {
 									<span className='time'>{getTimeFrame(notification.createdAt)}</span>
 								</p>
 								<div className= 'buttons'>
-									<ResponseButton onClick={() => clearNotification(notification._id)} >
+									<ResponseButton onClick={() => clearNotification(notification)}>
 										Dismiss
 									</ResponseButton>
 								</div>

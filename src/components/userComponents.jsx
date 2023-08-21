@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 import { useRef } from 'react'
 import useAuth from '../context/authContext'
-import { SimpleLink } from '../styles/sharedComponentStyles'
+import { SimpleLink, headerBlue } from '../styles/sharedComponentStyles'
 
 export default function UserIcon ({ profilePicture, size }) {
 	return <Icon src={import.meta.env.VITE_SERVER + profilePicture} $size={size} alt="user icon" />
@@ -55,15 +55,15 @@ export function Badge ({ userData, style }) {
 	)
 }
 
-export function BadgeWithStatus ({ userData, style }) {
+export function ChatFriend ({ userData, isActive, onClick, style }) {
 	return (
-		<BadgeWithStatusContainer style={style}>
+		<ChatFriendContainer onClick={onClick} $isActive={isActive} style={style}>
 			<UserIcon profilePicture={userData.profilePicture} size='96px'/>
 			<div>
 				<p to={'/user/' + userData.id}>{userData.fullname}</p>
 				<Status $online={userData.isOnline }>{userData.isOnline ? 'Online' : 'Offline'}</Status>
 			</div>
-		</BadgeWithStatusContainer>
+		</ChatFriendContainer>
 	)
 }
 
@@ -73,11 +73,19 @@ const Icon = styled.img`
 	border-radius: 50%;
 `
 
-const BadgeWithStatusContainer = styled.div`
+const ChatFriendContainer = styled.button`
 	display: flex;
 	gap: 15px;
 	align-items: center;
-	p { margin: 10px; }
+	border: none;
+	width: 100%;
+	padding: 10px;
+	border-radius: 8px;
+	background: ${props => props.$isActive ? headerBlue : 'none'};
+	p {
+		text-align: start;
+		margin: 10px 0;
+	}
 `
 
 const Status = styled.p`

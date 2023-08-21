@@ -35,7 +35,7 @@ button {
 	cursor: pointer;
 }
 
-button:disabled {
+:disabled {
 	cursor: not-allowed;
 	opacity: .5;
 }

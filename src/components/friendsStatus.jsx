@@ -1,21 +1,24 @@
 import styled from 'styled-components'
-import { BadgeWithStatus } from './userComponents'
+import { ChatFriend } from './userComponents'
 import useAuth from '../context/authContext'
 
-export default function FriendsStatus () {
+export default function FriendsStatus ({ activeFriend, setActiveFriend }) {
 	const { user } = useAuth()
 
 	return (
 		<Container>
 			{user.friends.map(friend =>
-				<BadgeWithStatus key={friend.id} userData={friend} />
+				<ChatFriend
+					key={friend.id}
+					userData={friend}
+					isActive={activeFriend?.id === friend.id}
+					onClick={() => setActiveFriend(friend)}
+				/>
 			)}
 		</Container>
 	)
 }
 
-const Container = styled.div`
-	> div {
-		margin-bottom: 20px;
-	}
+const Container = styled.section`
+	> * { margin-bottom: 20px; }
 `

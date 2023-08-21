@@ -6,6 +6,7 @@ const AuthContext = createContext()
 
 export function AuthProvider ({ children }) {
 	const [user, setUser] = useState(null)
+	const [messages, setMessages] = useState([])
 	const [token, setToken] = useState(null)
 	const [loading, setLoading] = useState(true)
 
@@ -16,7 +17,6 @@ export function AuthProvider ({ children }) {
 		setToken(token)
 		axios.get(import.meta.env.VITE_API + '/user/current', {
 			headers: {
-				'Access-Control-Allow-Origin': true,
 				'Authorization': `Bearer ${token}`,
 				'Accept': 'application/json'
 			}
@@ -24,6 +24,19 @@ export function AuthProvider ({ children }) {
 			.catch(err => console.log(err.message))
 			.finally(() => setLoading(false))
 	}, [])
+
+	// On new login (instead of load), user document is sent back rather than fetched in above useEffect.
+	// To get current messages, add token as dependency in below useEffect.
+	useEffect(() => {
+		if (!token) return
+		axios.get(import.meta.env.VITE_API + '/message', {
+			headers: {
+				'Authorization': `Bearer ${token}`,
+				'Accept': 'application/json'
+			}
+		}).then(res => setMessages(res.data.documents))
+			.catch(err => console.log(err.message))
+	}, [token])
 
 	// SOCKET IO
 	useEffect( () => {
@@ -33,6 +46,7 @@ export function AuthProvider ({ children }) {
 		// Incoming messages
 		socket.on('userUpdate', userDocument => setUser(userDocument))
 		socket.on('message', message => console.log('SOCKET SERVER:', message))
+		socket.on('chatMessage', message => setMessages(prev => [...prev, message]))
 		socket.on('friendStatusUpdate', status =>
 			setUser(currentUser => {
 				console.log('friendStatusUpdate', status)
@@ -50,7 +64,11 @@ export function AuthProvider ({ children }) {
 					}
 				})
 
+				// Will be lost on refresh but this is intended for friend status updates as it doesn't
+				// make sense to save such notifications to the user document in the database
 				const notification = {
+					id: crypto.randomUUID(),
+					runtimeOnly: true,
 					type: 'friend-update',
 					user: updatedFriend,
 					message: status.isOnline ? ' came online' : ' went offline',
@@ -132,21 +150,32 @@ export function AuthProvider ({ children }) {
 		localStorage.removeItem('odinbook-token')
 	}
 
-	function clearNotification (id) {
-		axios.patch(import.meta.env.VITE_API + '/user/clearNotification',
-			{ id },
-			{ headers: { 'Authorization': `Bearer ${token}` }}
-		).then(res => { if (res.status === 200) setUser(res.data.document) }
-		).catch(err => { console.log(err.message) })
+	function clearNotification (notification) {
+		if (notification.runtimeOnly) {
+			setUser(user => {
+				return {
+					...user,
+					notifications: user.notifications.filter(n => n.id !== notification.id)
+				}
+			})
+		} else {
+			axios.patch(import.meta.env.VITE_API + '/user/clearNotification',
+				{ id: notification._id },
+				{ headers: { 'Authorization': `Bearer ${token}` }}
+			).then(res => { if (res.status === 200) setUser(res.data.document) }
+			).catch(err => { console.log(err.message) })
+		}
 	}
 
 	return (
 		<AuthContext.Provider value={{
 			user,
 			token,
+			messages,
 			login,
 			logout,
 			setUser,
+			setMessages,
 			sendFriendRequest,
 			removeFriend,
 			acceptFriendRequest,
