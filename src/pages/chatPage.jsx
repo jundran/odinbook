@@ -23,12 +23,21 @@ export default function ChatPage () {
 
 const Container = styled.div`
 	flex-grow: 1;
-	display: grid;
-	grid-template-columns: auto 1fr;
-	grid-template-rows: 1fr;
+	display: flex;
 	gap: 32px;
+	min-height: 300px;
+	max-height: 590px;
 	@media (max-width: ${TABLET_SMALL}) {
-		grid-template-columns: 1fr;
-		grid-template-rows: auto 400px;
+		flex-direction: column;
+		gap: 10px;
+		min-height: auto;
+		max-height: max-content;
+		.FriendsStatus {
+			max-height: 290px;
+		}
+		.Chat {
+			min-height: 300px;
+			max-height: 396px;
+		}
 	}
 `

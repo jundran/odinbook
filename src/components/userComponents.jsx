@@ -58,7 +58,7 @@ export function Badge ({ userData, style }) {
 export function ChatFriend ({ userData, isActive, onClick, style }) {
 	return (
 		<ChatFriendContainer onClick={onClick} $isActive={isActive} style={style}>
-			<UserIcon profilePicture={userData.profilePicture} size='96px'/>
+			<UserIcon profilePicture={userData.profilePicture} size='48px'/>
 			<div>
 				<p to={'/user/' + userData.id}>{userData.fullname}</p>
 				<Status $online={userData.isOnline }>{userData.isOnline ? 'Online' : 'Offline'}</Status>
@@ -78,6 +78,7 @@ const ChatFriendContainer = styled.button`
 	gap: 15px;
 	align-items: center;
 	border: none;
+	min-width: 200px;
 	width: 100%;
 	padding: 10px;
 	border-radius: 8px;

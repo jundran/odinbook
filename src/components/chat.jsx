@@ -58,7 +58,7 @@ export default function Chat ({ activeFriendId }) {
 	}
 
 	return (
-		<Container>
+		<Container className='Chat'>
 			<Title $isOnline={friend?.isOnline}>
 				{friend ?
 					<>
@@ -94,6 +94,7 @@ const Container = styled.section`
 	border: 5px solid;
 	display: flex;
 	flex-direction: column;
+	overflow: auto;
 `
 
 const Title = styled.p`
@@ -107,11 +108,11 @@ const Title = styled.p`
 `
 
 const ChatWindow = styled.div`
+	flex-grow: 1;
+	overflow: auto;
 	display: flex;
 	flex-direction: column;
-	flex-grow: 1;
 	padding: 10px;
-	overflow: auto;
 `
 
 const Message = styled.div`

@@ -6,7 +6,7 @@ export default function FriendsStatus ({ activeFriend, setActiveFriend }) {
 	const { user } = useAuth()
 
 	return (
-		<Container>
+		<Container className='FriendsStatus'>
 			{user.friends.map(friend =>
 				<ChatFriend
 					key={friend.id}
@@ -20,5 +20,5 @@ export default function FriendsStatus ({ activeFriend, setActiveFriend }) {
 }
 
 const Container = styled.section`
-	> * { margin-bottom: 20px; }
+	overflow: auto;
 `
