@@ -49,9 +49,7 @@ export function AuthProvider ({ children }) {
 		socket.on('chatMessage', message => setMessages(prev => [...prev, message]))
 		socket.on('friendStatusUpdate', status =>
 			setUser(currentUser => {
-				console.log('friendStatusUpdate', status)
 				let updatedFriend = null
-
 				const updatedFriends = currentUser.friends.map(friend => {
 					if (friend.id === status.id) {
 						updatedFriend = friend

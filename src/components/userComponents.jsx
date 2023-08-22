@@ -56,12 +56,21 @@ export function Badge ({ userData, style }) {
 }
 
 export function ChatFriend ({ userData, isActive, onClick, style }) {
+	const { user, messages } = useAuth()
+	const unreadMessageCount = messages.filter(m => m.sender !== user.id && !m.isRead).length
+
 	return (
 		<ChatFriendContainer onClick={onClick} $isActive={isActive} style={style}>
 			<UserIcon profilePicture={userData.profilePicture} size='48px'/>
 			<div>
 				<p to={'/user/' + userData.id}>{userData.fullname}</p>
 				<Status $online={userData.isOnline }>{userData.isOnline ? 'Online' : 'Offline'}</Status>
+				{!isActive &&
+					<UnreadMessageCount>
+						<span>{unreadMessageCount} </span>
+						<span>{unreadMessageCount === 1 ? 'unread message' : 'unread messages'}</span>
+					</UnreadMessageCount>
+				}
 			</div>
 		</ChatFriendContainer>
 	)
@@ -93,6 +102,11 @@ const Status = styled.p`
 	font-size: 80%;
 	font-weight: 600;
 	color: ${props => props.$online ? 'green' : 'grey' }
+`
+
+const UnreadMessageCount = styled.p`
+	font-size: 80%;
+	span { font-weight: 600; }
 `
 
 const UserBadgeContainer = styled.div`

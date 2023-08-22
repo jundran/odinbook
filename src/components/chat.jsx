@@ -15,6 +15,28 @@ export default function Chat ({ activeFriendId }) {
 	const { user, token, messages, setMessages } = useAuth()
 	const chatWindowRef = useRef()
 
+	// Mark messages as unread after 5 seconds from chat opening or new message appearing
+	useEffect(() => {
+		const unreadMessagesIds = filteredMessages.filter(m =>
+			m.sender !== user.id && !m.isRead).map(m => m._id
+		)
+		if (!unreadMessagesIds.length) return
+
+		setTimeout(() => {
+			axios.patch(import.meta.env.VITE_API + '/message/read',
+				{ ids: unreadMessagesIds },
+				{ headers: { 'Authorization': `Bearer ${token}` }}
+			).then(res => {
+				if (res.status === 204) {
+					setMessages(messages => messages.map(m => {
+						if (m.sender === friend.id) return { ...m, isRead: true }
+						else return m
+					}))
+				}
+			}).catch(err => { console.log(err.message) })
+		}, [5000])
+	}, [filteredMessages, friend?.id, setMessages, token, user.id])
+
 	useEffect(() => {
 		if (!activeFriendId) return
 		setFriend(user.friends.find(f => f.id === activeFriendId))
@@ -64,14 +86,18 @@ export default function Chat ({ activeFriendId }) {
 					<>
 						<span>Chatting with </span>
 						<span className='name'>{friend.fullname} </span>
-						(<span className='status'>{friend.isOnline ? 'online' : 'offline'}</span>)
+						(<span className='status'>{friend.isOnline ? 'Online' : 'Offline'}</span>)
 					</> :
 					'Select friend to chat with'
 				}
 			</Title>
 			<ChatWindow ref={chatWindowRef}>
 				{filteredMessages.map(message =>
-					<Message key={message._id} $isSender={message.sender === user.id}>
+					<Message
+						key={message._id}
+						$isSender={message.sender === user.id}
+						$isRead={message.sender === user.id || message.isRead}
+					>
 						<span>{message.sender === user.id ? user.firstname : friend.firstname}</span>
 						<span>{message.text}</span>
 					</Message>
@@ -127,6 +153,9 @@ const Message = styled.div`
 	}
 	span + span {
 		margin-left: 10px;
+		${props => !props.$isRead && `
+			&:before { content: '[new] ' }
+		`}
 	}
 `
 

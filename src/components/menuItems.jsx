@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import useAuth from '../context/authContext'
 import { getTimeFrame } from '../utilities/time'
 import { headerBlue } from '../styles/sharedComponentStyles'
@@ -9,10 +9,18 @@ import notificationsPendingIcon from '../assets/notifications-pending.svg'
 import chatIcon from '../assets/chat.svg'
 
 export function ChatIcon () {
+	const { user, messages } = useAuth()
+	const location = useLocation()
+
+	const unreadMessageCount = messages.filter(m => m.sender !== user.id && !m.isRead).length || ''
+
 	return (
-		<Link to='/chat'>
-			<HeaderIcon src={chatIcon} alt='' />
-		</Link>
+		<MenuItemContainer>
+			<Link to='/chat'>
+				<HeaderIcon src={chatIcon} alt='' />
+				{location.pathname !== '/chat' && <span>{unreadMessageCount}</span>}
+			</Link>
+		</MenuItemContainer>
 	)
 }
 
@@ -101,8 +109,9 @@ const HeaderIcon = styled.img`
 `
 
 const MenuItemContainer = styled.div`
-	button span {
-		color: #fff
+	a span, button span {
+		color: #fff;
+		font-size: 1rem;
 	}
 `
 
