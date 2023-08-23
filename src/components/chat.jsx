@@ -2,6 +2,7 @@ import styled from 'styled-components'
 import { useEffect, useRef, useState } from 'react'
 import axios from 'axios'
 import useAuth from '../context/authContext'
+import Message from './message'
 import { MOBILE, headerBlue } from '../styles/sharedComponentStyles'
 
 // Only taking in id in props and setting friends in useEffect so that when friends
@@ -93,15 +94,7 @@ export default function Chat ({ activeFriendId }) {
 			</Title>
 			<ChatWindow ref={chatWindowRef}>
 				{filteredMessages.map(message =>
-					<Message
-						key={message._id}
-						$isSender={message.sender === user.id}
-						$isRead={message.sender === user.id || message.isRead}
-					>
-						{/* TODO - add how long ago message was posted */}
-						<span>{message.sender === user.id ? user.firstname : friend.firstname}</span>
-						<span>{message.text}</span>
-					</Message>
+					<Message key={message._id} data={message} friend={friend} />
 				)}
 			</ChatWindow>
 			<ChatInput onSubmit={handleSubmit}>
@@ -140,26 +133,8 @@ const ChatWindow = styled.div`
 	display: flex;
 	flex-direction: column;
 	padding: 10px;
+	gap: 10px;
 `
-
-const Message = styled.div`
-	margin-bottom: 10px;
-	span {
-		color: ${props => props.$isSender ? 'black' : 'teal'};
-	}
-	span:first-of-type {
-		font-weight: 600;
-		&:before { content: '[' }
-		&:after { content: ']' }
-	}
-	span + span {
-		margin-left: 10px;
-		${props => !props.$isRead && `
-			&:before { content: '[new] ' }
-		`}
-	}
-`
-
 const ChatInput = styled.form`
 	display: flex;
 	border-top: 1px solid;

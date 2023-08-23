@@ -6,7 +6,6 @@ import Chat from '../components/chat'
 import { TABLET_SMALL, headerBlue } from '../styles/sharedComponentStyles'
 import { SimpleLink } from '../styles/sharedComponentStyles'
 
-// TODO - handle case where user has no friends
 export default function ChatPage () {
 	document.title = 'Chat'
 	const [activeFriend, setActiveFriend] = useState(null)
