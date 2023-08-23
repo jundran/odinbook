@@ -27,11 +27,19 @@ export default function AboutPage () {
 				</p>
 				<h2>People</h2>
 				<p>
-					The people page allows users to find other users that they can send friend requests to. It shows all registered users. It has a search feature which would be useful if there were more users.
+					The people page allows users to find other users that they can send friend requests to. It shows all registered users. It has a search feature that would be useful if there were more users.
 				</p>
 				<h2>User Page</h2>
 				<p>
 					The user page or profile page for the logged in user shows the user&apos;s profile photo and general information about them. If the user page is for a friend then it will show that person&apos;s posts as well as their friends. Otherwise it will not show posts and show only mutual friends shared between the logged in user and the user for privacy. If the user page (profile) belongs to the user then they can edit it. They can change their profile picture and information including password and email address. Email addresses must be unique in the database. User profile pictures must be squared and crop tool is provided to do this. Users can also delete their account with password verification. A demo account cannot be deleted but if you enter the password (literally &apos;password&apos; unless someone has changed it) then you will be logged out as if it was.
+				</p>
+				<h2>Chat</h2>
+				<p>
+					Users can send messages to befriended users usng the socketIO server. The number of unread messages is shown in the header next to the icon which takes users to the chat page. On the chat page users can select friends to see the chat window. Unread messages for each friend are shown on the friend selector component rather than in the header when on the chat page. User online status is also show and updated in real time. Inside the chat area the user can see the conversation with unread messages highlighted. Unread messages are marked as read in the database after they have been viewed. Messages sent to offline users will be available to them when they log in again.
+				</p>
+				<h2>Multiple client connections</h2>
+				<p>
+					Users can open the app in multiple tabs or browsers, even from different devices or locations and each will remain in sync as the server manages an array of web socket connections, one for each client logged in with a given account. Only when the last client is closed or logged out, is the user marked as offline, and only when the first client is logged in, will the user be marked as coming online in order to notify friends of that user that their online status has changed.
 				</p>
 				<h2>Login and Security</h2>
 				<p>
