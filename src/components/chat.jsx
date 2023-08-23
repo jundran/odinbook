@@ -98,6 +98,7 @@ export default function Chat ({ activeFriendId }) {
 						$isSender={message.sender === user.id}
 						$isRead={message.sender === user.id || message.isRead}
 					>
+						{/* TODO - add how long ago message was posted */}
 						<span>{message.sender === user.id ? user.firstname : friend.firstname}</span>
 						<span>{message.text}</span>
 					</Message>

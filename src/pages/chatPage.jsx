@@ -4,6 +4,7 @@ import FriendsStatus from '../components/friendsStatus'
 import Chat from '../components/chat'
 import { TABLET_SMALL } from '../styles/sharedComponentStyles'
 
+// TODO - handle case where user has no friends
 export default function ChatPage () {
 	document.title = 'Chat'
 	const [activeFriend, setActiveFriend] = useState(null)

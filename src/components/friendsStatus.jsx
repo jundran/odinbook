@@ -20,5 +20,6 @@ export default function FriendsStatus ({ activeFriend, setActiveFriend }) {
 }
 
 const Container = styled.section`
+	flex-shrink: 0;
 	overflow: auto;
 `

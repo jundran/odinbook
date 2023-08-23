@@ -57,7 +57,9 @@ export function Badge ({ userData, style }) {
 
 export function ChatFriend ({ userData, isActive, onClick, style }) {
 	const { user, messages } = useAuth()
-	const unreadMessageCount = messages.filter(m => m.sender !== user.id && !m.isRead).length
+	const unreadMessageCount = messages.filter(m =>
+		m.sender !== user.id && !m.isRead && userData.id === m.sender
+	).length
 
 	return (
 		<ChatFriendContainer onClick={onClick} $isActive={isActive} style={style}>
