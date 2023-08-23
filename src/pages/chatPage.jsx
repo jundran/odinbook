@@ -1,22 +1,33 @@
 import styled from 'styled-components'
 import { useState } from 'react'
+import useAuth from '../context/authContext'
 import FriendsStatus from '../components/friendsStatus'
 import Chat from '../components/chat'
-import { TABLET_SMALL } from '../styles/sharedComponentStyles'
+import { TABLET_SMALL, headerBlue } from '../styles/sharedComponentStyles'
+import { SimpleLink } from '../styles/sharedComponentStyles'
 
 // TODO - handle case where user has no friends
 export default function ChatPage () {
 	document.title = 'Chat'
 	const [activeFriend, setActiveFriend] = useState(null)
+	const { user } = useAuth()
 
 	return (
 		<main>
 			<Container>
-				<FriendsStatus
-					activeFriend={activeFriend}
-					setActiveFriend={friend => setActiveFriend(friend)}
-				/>
-				<Chat activeFriendId={activeFriend?.id} />
+				{user.friends.length ?
+					<>
+						<FriendsStatus
+							activeFriend={activeFriend}
+							setActiveFriend={friend => setActiveFriend(friend)}
+						/>
+						<Chat activeFriendId={activeFriend?.id} />
+					</> :
+					<NoFriends>
+						<p>Add friends to start a conversation</p>
+						<SimpleLink to='/people'>Find Friends</SimpleLink>
+					</NoFriends>
+				}
 			</Container>
 		</main>
 	)
@@ -42,3 +53,12 @@ const Container = styled.div`
 		}
 	}
 `
+
+const NoFriends = styled.div`
+	margin: 10% auto;
+	height: fit-content;
+	border: 5px dotted ${headerBlue};
+	padding: 32px;
+	text-align: center;
+`
+
