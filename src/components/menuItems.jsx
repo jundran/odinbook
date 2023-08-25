@@ -29,7 +29,7 @@ export function Friends ({ showDropdown, setShowDropdown }) {
 
 	const hasItems = user.incomingFriendRequests.length ? user.incomingFriendRequests.length : false
 	return (
-		<MenuItemContainer>
+		<MenuItemContainer onBlur={e => e.relatedTarget === null && setShowDropdown(false)}>
 			<button aria-label='Incoming friend requests' className='icon-button' onClick={setShowDropdown}>
 				<HeaderIcon src={friendsIcon} alt='' />
 				{hasItems && <span>{hasItems}</span>}
@@ -69,7 +69,7 @@ export function Notifications ({ showDropdown, setShowDropdown }) {
 
 	const hasItems = user.notifications.length ? user.notifications.length : false
 	return (
-		<MenuItemContainer>
+		<MenuItemContainer onBlur={e => e.relatedTarget === null && setShowDropdown(false)}>
 			<button aria-label='unread notifications' className='icon-button' onClick={setShowDropdown}>
 				<HeaderIcon src={hasItems ? notificationsPendingIcon : notificationsIcon} alt='' />
 				{hasItems && <span>{hasItems}</span>}
