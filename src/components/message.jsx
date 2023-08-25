@@ -6,8 +6,6 @@ import UserIcon from './userComponents'
 export default function Message ({ data, friend }) {
 	const { user } = useAuth()
 	const userIsSender = data.sender === user.id
-	// Mark as read if user is sender because only recipient should mark message as read
-	const isRead = userIsSender || data.isRead
 
 	return (
 		<MessageContainer>
@@ -16,7 +14,7 @@ export default function Message ({ data, friend }) {
 				size='24px'
 			/>
 			<div>
-				<MessageHeader $isSender={userIsSender} $isRead={isRead}>
+				<MessageHeader $isSender={userIsSender}>
 					<span className='name'>{userIsSender ? user.firstname : friend.firstname}</span>
 					<span className='time'>{getTimeFrame(data.createdAt)}</span>
 				</MessageHeader>
@@ -47,14 +45,6 @@ const MessageHeader = styled.div`
 		font-weight: 600;
 		color: #444444;
 	}
-	${props => props.$isRead === false && `
-		&:after {
-			content: 'new';
-			font-size: .6rem;
-			font-weight: 600;
-			color: seagreen;
-		}
-	`}
 `
 
 const MessageText = styled.p`

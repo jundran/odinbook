@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import axios from 'axios'
 import useAuth from '../context/authContext'
 import Message from './message'
@@ -9,66 +9,81 @@ import { MOBILE, headerBlue } from '../styles/sharedComponentStyles'
 // online status changes in user object from useAuth then state is reflected here
 export default function Chat ({ activeFriendId }) {
 	// TODO - show input that matches the friend's window
-	const [input, setInput] = useState('')
 	const [sending, setSending] = useState(false)
 	const [filteredMessages, setFitleredMessages] = useState([])
 	const [friend, setFriend] = useState(null)
 	const { user, token, messages, setMessages } = useAuth()
 	const chatWindowRef = useRef()
+	const chatWindowIsAtBottom = useRef()
 
-	// Mark messages as unread after 5 seconds from chat opening or new message appearing
-	useEffect(() => {
-		const unreadMessagesIds = filteredMessages.filter(m =>
-			m.sender !== user.id && !m.isRead).map(m => m._id
-		)
-		if (!unreadMessagesIds.length) return
+	const messageIsUnread = useCallback(message => {
+		// Message may be unread but if it was send by user, mark as such
+		return message.sender !== user.id && !message.isRead
+	}, [user.id])
 
-		setTimeout(() => {
-			axios.patch(import.meta.env.VITE_API + '/message/read',
-				{ ids: unreadMessagesIds },
-				{ headers: { 'Authorization': `Bearer ${token}` }}
-			).then(res => {
-				if (res.status === 204) {
-					setMessages(messages => messages.map(m => {
-						if (m.sender === friend.id) return { ...m, isRead: true }
-						else return m
-					}))
-				}
-			}).catch(err => { console.log(err.message) })
-		}, [5000])
-	}, [filteredMessages, friend?.id, setMessages, token, user.id])
-
+	// Set friend on selection
 	useEffect(() => {
 		if (!activeFriendId) return
 		setFriend(user.friends.find(f => f.id === activeFriendId))
 	}, [activeFriendId, user.friends])
 
+	// Mark messages as unread after 5 seconds from chat opening or new message appearing
 	useEffect(() => {
-		if (!friend?.id) return
+		const unreadMessagesIds = filteredMessages.filter(m => messageIsUnread(m)).map(m => m._id)
+		if (!unreadMessagesIds.length) return
+
+		axios.patch(import.meta.env.VITE_API + '/message/read',
+			{ ids: unreadMessagesIds },
+			{ headers: { 'Authorization': `Bearer ${token}` }}
+		).then(res => {
+			if (res.status === 204) {
+				setMessages(messages => messages.map(m => {
+					if (m.sender === friend.id) return { ...m, isRead: true }
+					else return m
+				}))
+			}
+		}).catch(err => { console.log(err.message) })
+	}, [filteredMessages, friend, messageIsUnread, setMessages, token])
+
+	// Filter messages when they arrive
+	useEffect(() => {
+		if (!friend) return
+
+		// Check if chat is scrolled to bottom
+		const {scrollHeight, scrollTop, clientHeight} = chatWindowRef.current
+		const difference = scrollHeight - (scrollTop + clientHeight)
+		chatWindowIsAtBottom.current = difference < 1  // Calculation on chrome can be off by .5
+		// console.log(scrollHeight, scrollTop, clientHeight, difference, chatWindowIsAtBottom.current)
+
 		setFitleredMessages(messages.filter(message =>
 			(message.sender === user.id || message.recipient === user.id) &&
 			(message.sender === friend.id || message.recipient === friend.id)))
-	}, [messages, friend?.id, user.id])
+	}, [messages, friend, user.id])
 
+	// Scroll chat when new message arrives or is sent, but only if chat is already scrolled to bottom
 	useEffect(() => {
-		// TODO - prompt user to scroll down rather than doing it for them
-		chatWindowRef.current.scrollTop = chatWindowRef.current.scrollHeight
+		if (chatWindowIsAtBottom.current)	{
+			chatWindowRef.current.scrollTop = chatWindowRef.current.scrollHeight
+		}
 	}, [filteredMessages])
 
 	function handleSubmit (e) {
 		e.preventDefault()
+		const text = e.target.text.value.trim()
+		if (!text) return
 		setSending(true)
+		chatWindowRef.current.scrollTop = chatWindowRef.current.scrollHeight
+		e.target.text.value = ''
 		axios.post(import.meta.env.VITE_API + '/message', {
 			sender: user.id,
 			recipient: friend.id,
-			text: input.trim()
+			text
 		}, {
 			headers: {
 				'Authorization': `Bearer ${token}`,
 				'Accept': 'application/json'
 			}
 		}).then(res => {
-			setInput('')
 			setSending(false)
 			setMessages(messages =>[...messages, res.data.document])
 		}).catch(err => console.log(err.message))
@@ -94,16 +109,12 @@ export default function Chat ({ activeFriendId }) {
 			</Title>
 			<ChatWindow ref={chatWindowRef}>
 				{filteredMessages.map(message =>
-					<Message key={message._id} data={message} friend={friend} />
-				)}
+					<Message key={message._id} data={message} friend={friend} />)
+				}
 			</ChatWindow>
 			<ChatInput onSubmit={handleSubmit}>
-				<input
-					disabled={!friend} value={input}
-					onChange={e => setInput(e.target.value)}
-					placeholder={getPlaceHolder()}
-				/>
-				<button disabled={sending || !input.trim().length}>Send</button>
+				<input name='text' disabled={!friend} placeholder={getPlaceHolder()} />
+				<button disabled={sending}>Send</button>
 			</ChatInput>
 		</Container>
 	)
