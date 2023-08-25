@@ -35,7 +35,7 @@ export default function AboutPage () {
 				</p>
 				<h2>Chat</h2>
 				<p>
-					Users can send messages to befriended users usng the socketIO server. The number of unread messages is shown in the header next to the icon which takes users to the chat page. On the chat page users can select friends to see the chat window. Unread messages for each friend are shown on the friend selector component rather than in the header when on the chat page. User online status is also show and updated in real time. Inside the chat area the user can see the conversation with unread messages highlighted. Unread messages are marked as read in the database after they have been viewed. Messages sent to offline users will be available to them when they log in again.
+					Users can send messages to befriended users. This is provided by the socketIO server. The number of unread messages is shown in the header next to the icon which takes the user to the chat page. On the chat page users can select friends to load the conversation into the chat window. When on the chat page, unread messages for each friend are shown on the friend selector component rather than in the header. User online status is also displayed and updated in real time. Unread messages are marked as read in the database after they have been rendered. Messages sent to offline users will be available to them when they log in again. If the user opens multiple browsers or tabs, messages are synced using socketIO.
 				</p>
 				<h2>Multiple client connections</h2>
 				<p>
@@ -47,7 +47,7 @@ export default function AboutPage () {
 				</p>
 				<h2>Routing</h2>
 				<p>
-					React Router along with React context manages client side routing depending on if the user is logged in or not. Only this About page can be viewed if not logged in otherwise the user will be shown the login page. This is managed using hash router from React Router. Hash router is preferable to the standard router because it allowes refreshing the page and direct navigation via links or pasting in a URL without 404s. Furthermore, document titles are set for each page to aid with navigating using the browser history API.
+					React Router along with React context manages client side routing depending on if the user is logged in or not. Only this About page can be viewed if not logged in, otherwise the user will be shown the login page. This is managed using hash router from React Router. In the URL, paths after the hash are managed by the client router, hense the name. Hash router is preferable to the standard router because it enables refreshing the page and direct navigation via links or pasting in a URL without 404s. Furthermore, document titles are set for each page to aid with navigating using the browser history API.
 				</p>
 			</AboutContainer>
 		</main>
