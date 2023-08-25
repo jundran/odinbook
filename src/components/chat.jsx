@@ -12,9 +12,10 @@ export default function Chat ({ activeFriendId }) {
 	const [sending, setSending] = useState(false)
 	const [filteredMessages, setFitleredMessages] = useState([])
 	const [friend, setFriend] = useState(null)
+	const [messagesWaiting, setMessagesWaiting] = useState(false)
 	const { user, token, messages, setMessages } = useAuth()
 	const chatWindowRef = useRef()
-	const chatWindowIsAtBottom = useRef()
+	const chatWindowIsAtBottom = useRef(true)
 
 	const messageIsUnread = useCallback(message => {
 		// Message may be unread but if it was send by user, mark as such
@@ -24,10 +25,27 @@ export default function Chat ({ activeFriendId }) {
 	// Set friend on selection
 	useEffect(() => {
 		if (!activeFriendId) return
+		chatWindowRef.current.scrollTop = chatWindowRef.current.scrollHeight
+		chatWindowIsAtBottom.current = true // reset after friend selection change
 		setFriend(user.friends.find(f => f.id === activeFriendId))
 	}, [activeFriendId, user.friends])
 
-	// Mark messages as unread after 5 seconds from chat opening or new message appearing
+	// Filter messages when they arrive
+	useEffect(() => {
+		if (!friend) return
+		// Check if chat window is at the bottom
+		const {scrollHeight, scrollTop, clientHeight} = chatWindowRef.current
+		const difference = scrollHeight - (scrollTop + clientHeight)
+		chatWindowIsAtBottom.current = difference < 1  // Calculation on chrome can be off by .5
+		// console.log(scrollHeight, scrollTop, clientHeight, difference, chatWindowIsAtBottom.current)
+
+		setFitleredMessages(messages.filter(message =>
+			(message.sender === user.id || message.recipient === user.id) &&
+			(message.sender === friend.id || message.recipient === friend.id))
+		)
+	}, [messages, friend, user.id])
+
+	// Mark messages as read when they are filtered and rendered
 	useEffect(() => {
 		const unreadMessagesIds = filteredMessages.filter(m => messageIsUnread(m)).map(m => m._id)
 		if (!unreadMessagesIds.length) return
@@ -45,26 +63,12 @@ export default function Chat ({ activeFriendId }) {
 		}).catch(err => { console.log(err.message) })
 	}, [filteredMessages, friend, messageIsUnread, setMessages, token])
 
-	// Filter messages when they arrive
+	// Scroll chat if it's at the bottom else notify of waiting messages
 	useEffect(() => {
-		if (!friend) return
-
-		// Check if chat is scrolled to bottom
-		const {scrollHeight, scrollTop, clientHeight} = chatWindowRef.current
-		const difference = scrollHeight - (scrollTop + clientHeight)
-		chatWindowIsAtBottom.current = difference < 1  // Calculation on chrome can be off by .5
-		// console.log(scrollHeight, scrollTop, clientHeight, difference, chatWindowIsAtBottom.current)
-
-		setFitleredMessages(messages.filter(message =>
-			(message.sender === user.id || message.recipient === user.id) &&
-			(message.sender === friend.id || message.recipient === friend.id)))
-	}, [messages, friend, user.id])
-
-	// Scroll chat when new message arrives or is sent, but only if chat is already scrolled to bottom
-	useEffect(() => {
-		if (chatWindowIsAtBottom.current)	{
+		if (chatWindowIsAtBottom.current) {
 			chatWindowRef.current.scrollTop = chatWindowRef.current.scrollHeight
 		}
+		else setMessagesWaiting(true)
 	}, [filteredMessages])
 
 	function handleSubmit (e) {
@@ -95,6 +99,18 @@ export default function Chat ({ activeFriendId }) {
 		else return 'Select friend to type a message'
 	}
 
+	function handleClick () {
+		chatWindowRef.current.scrollTop = chatWindowRef.current.scrollHeight
+		setMessagesWaiting(false)
+	}
+
+	function handleScroll () {
+		// setMessagesWaiting(false) if chat window is at the bottom
+		const {scrollHeight, scrollTop, clientHeight} = chatWindowRef.current
+		const difference = scrollHeight - (scrollTop + clientHeight)
+		if (difference < 1) setMessagesWaiting(false)
+	}
+
 	return (
 		<Container className='Chat'>
 			<Title $isOnline={friend?.isOnline}>
@@ -107,11 +123,14 @@ export default function Chat ({ activeFriendId }) {
 					'Select friend to chat with'
 				}
 			</Title>
-			<ChatWindow ref={chatWindowRef}>
+			<ChatWindow ref={chatWindowRef} onScroll={handleScroll}>
 				{filteredMessages.map(message =>
 					<Message key={message._id} data={message} friend={friend} />)
 				}
 			</ChatWindow>
+			{messagesWaiting &&
+				<Status onClick={handleClick}>Messages Waiting</Status>
+			}
 			<ChatInput onSubmit={handleSubmit}>
 				<input name='text' disabled={!friend} placeholder={getPlaceHolder()} />
 				<button disabled={sending}>Send</button>
@@ -146,6 +165,18 @@ const ChatWindow = styled.div`
 	padding: 10px;
 	gap: 10px;
 `
+
+const Status = styled.button`
+	background: none;
+	border: none;
+	border-top: 1px solid #222;
+	padding: 10px;
+	text-align: center;
+	font-weight: 600;
+	font-size: .8rem;
+	&:hover { color: navy; }
+`
+
 const ChatInput = styled.form`
 	display: flex;
 	border-top: 1px solid;
