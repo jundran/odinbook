@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 import useAuth from '../context/authContext'
-import { getTimeFrame } from '../utilities/time'
+import { formatTime } from '../utilities/time'
 import UserIcon from './userComponents'
 
 export default function Message ({ data, friend }) {
@@ -16,7 +16,7 @@ export default function Message ({ data, friend }) {
 			<div>
 				<MessageHeader $isSender={userIsSender}>
 					<span className='name'>{userIsSender ? user.firstname : friend.firstname}</span>
-					<span className='time'>{getTimeFrame(data.createdAt)}</span>
+					<span className='time'>{formatTime(data.createdAt)}</span>
 				</MessageHeader>
 				<MessageText>{data.text}</MessageText>
 			</div>

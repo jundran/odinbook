@@ -22,6 +22,17 @@ export function formatDate (date) {
 	})
 }
 
+export function formatTime (date) {
+	const isToday = new Date(date).getDate() === new Date().getDate()
+	const options = {
+		year: 'numeric', month: 'long', day: 'numeric',
+		hour: 'numeric', minute: 'numeric', second: 'numeric'
+	}
+	return isToday ?
+		new Date(date).toLocaleTimeString(undefined) :
+		new Date(date).toLocaleDateString(undefined, options)
+}
+
 export function getAge (dob) {
 	const [y, m, d] = dob.split(/-|T/)
 	const now = new Date()
