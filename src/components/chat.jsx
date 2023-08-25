@@ -8,7 +8,6 @@ import { MOBILE, headerBlue } from '../styles/sharedComponentStyles'
 // Only taking in id in props and setting friends in useEffect so that when friends
 // online status changes in user object from useAuth then state is reflected here
 export default function Chat ({ activeFriendId }) {
-	// TODO - show input that matches the friend's window
 	const [sending, setSending] = useState(false)
 	const [filteredMessages, setFitleredMessages] = useState([])
 	const [friend, setFriend] = useState(null)
@@ -18,7 +17,7 @@ export default function Chat ({ activeFriendId }) {
 	const chatWindowIsAtBottom = useRef(true)
 
 	const messageIsUnread = useCallback(message => {
-		// Message may be unread but if it was send by user, mark as such
+		// Message may be unread but if it was sent by user, mark as such
 		return message.sender !== user.id && !message.isRead
 	}, [user.id])
 
@@ -87,9 +86,9 @@ export default function Chat ({ activeFriendId }) {
 				'Authorization': `Bearer ${token}`,
 				'Accept': 'application/json'
 			}
-		}).then(res => {
+		}).then(() => {
 			setSending(false)
-			setMessages(messages =>[...messages, res.data.document])
+			// Do not set message here because it will be returned by socketIO to keep all clients in sync
 		}).catch(err => console.log(err.message))
 	}
 
@@ -105,7 +104,7 @@ export default function Chat ({ activeFriendId }) {
 	}
 
 	function handleScroll () {
-		// setMessagesWaiting(false) if chat window is at the bottom
+		// setMessagesWaiting(false) if chat window is scrolled to the bottom
 		const {scrollHeight, scrollTop, clientHeight} = chatWindowRef.current
 		const difference = scrollHeight - (scrollTop + clientHeight)
 		if (difference < 1) setMessagesWaiting(false)

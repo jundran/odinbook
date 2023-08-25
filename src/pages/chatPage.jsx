@@ -3,8 +3,7 @@ import { useState } from 'react'
 import useAuth from '../context/authContext'
 import FriendsStatus from '../components/friendsStatus'
 import Chat from '../components/chat'
-import { TABLET_SMALL, headerBlue } from '../styles/sharedComponentStyles'
-import { SimpleLink } from '../styles/sharedComponentStyles'
+import { TABLET_SMALL, headerBlue, SimpleLink } from '../styles/sharedComponentStyles'
 
 export default function ChatPage () {
 	document.title = 'Chat'
