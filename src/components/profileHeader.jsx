@@ -56,10 +56,9 @@ const Profile = styled.section`
 	img {
 		border-radius: 50%;
 		width: 180px;
-		height: auto;
-		@media (max-width: ${MOBILE}) { 
+		height: fit-content;
+		@media (max-width: ${MOBILE}) {
 			width: 120px;
-			margin-bottom: 10px;
 		}
 	}
 `
