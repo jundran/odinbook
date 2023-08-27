@@ -8,7 +8,6 @@ import { Hamburger, MobileMenu } from './mobileMenu'
 import { headerBlue, DESKTOP, MOBILE } from '../styles/sharedComponentStyles'
 
 export default function Header () {
-	const [showDropdown, setShowDropdown] = useState(false)
 	const [showMenu, setShowMenu] = useState(false)
 	const { user } = useAuth()
 
@@ -27,20 +26,9 @@ export default function Header () {
 					<Right>
 						{user && <>
 							<ChatIcon />
-							<Friends showDropdown={showDropdown === 'notifications'}
-								setShowDropdown={() => setShowDropdown(
-									showDropdown === 'notifications' ? '' : 'notifications')
-								}
-							/>
-							<Notifications showDropdown={showDropdown === 'friends'}
-								setShowDropdown={() => setShowDropdown(
-									showDropdown === 'friends' ? '' : 'friends')
-								}
-							/>
-							<UserBadge user={user} showDropdown={showDropdown === 'logout'}
-								setShowDropdown={() => setShowDropdown(
-									showDropdown === 'logout' ? '' : 'logout')
-								}/>
+							<Friends />
+							<Notifications />
+							<UserBadge user={user} />
 						</>}
 					</Right>
 				</div>
@@ -55,6 +43,10 @@ const HeaderContainer = styled.header`
 	background: ${headerBlue};
 	padding: 16px;
 	> div {
+		@media (min-width: ${MOBILE}) {
+			// To position DropdownContainer
+			position: relative;
+		}
 		display: flex;
 		justify-content: space-between;
 		align-items: center;

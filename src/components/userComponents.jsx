@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { useRef } from 'react'
+import { useState } from 'react'
 import useAuth from '../context/authContext'
 import { SimpleLink, headerBlue } from '../styles/sharedComponentStyles'
 
@@ -7,25 +7,14 @@ export default function UserIcon ({ profilePicture, size }) {
 	return <Icon src={import.meta.env.VITE_SERVER + profilePicture} $size={size} alt="user icon" />
 }
 
-export function UserBadge ({ user, showDropdown, setShowDropdown }) {
-	const dropdownRef = useRef()
-
-	function handleClick () {
-		setShowDropdown(!showDropdown)
-	}
-
-	function handleBlur (e) {
-		// If blur event is not triggered by clicking button inside this
-		if (e.relatedTarget === null) setShowDropdown(false)
-	}
+export function UserBadge ({ user }) {
+	const [showDropdown, setShowDropdown] = useState(false)
 
 	return (
-		<UserBadgeContainer
-			onClick={handleClick}
-			ref={dropdownRef}
-			onBlur={handleBlur}
-		>
-			<button>
+		<UserBadgeContainer onBlur={e =>
+			!e.relatedTarget?.classList.contains('badge-dropdown-button') && setShowDropdown(false)
+		}>
+			<button onClick={() => setShowDropdown(prev => !prev)}>
 				<span>{user.fullname}</span>
 				<UserIcon profilePicture={user.profilePicture} size='40px' />
 			</button>
@@ -37,9 +26,15 @@ export function UserBadge ({ user, showDropdown, setShowDropdown }) {
 function BadgeDropdown () {
 	const { logout } = useAuth()
 
+	function handleClick (e) {
+		console.log('handle click logout')
+		console.log(e)
+		logout()
+	}
+
 	return (
 		<BadgeDropdownContainer>
-			<button onClick={() => logout()}>Logout</button>
+			<button className='badge-dropdown-button' onClick={handleClick}>Logout</button>
 		</BadgeDropdownContainer>
 	)
 }
@@ -94,6 +89,7 @@ const ChatFriendContainer = styled.button`
 	padding: 10px;
 	border-radius: 8px;
 	background: ${props => props.$isActive ? headerBlue : 'none'};
+	outline-offset: -5px;
 	p {
 		text-align: start;
 		margin: 10px 0;

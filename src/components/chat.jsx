@@ -180,6 +180,7 @@ const ChatInput = styled.form`
 	display: flex;
 	border-top: 1px solid;
 	input {
+		overflow: hidden;
 		flex-grow: 1;
 		font-size: 1rem;
 		padding: 10px;

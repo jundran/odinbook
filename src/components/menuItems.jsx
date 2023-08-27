@@ -1,8 +1,9 @@
 import styled from 'styled-components'
+import { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import useAuth from '../context/authContext'
 import { getTimeFrame } from '../utilities/time'
-import { headerBlue } from '../styles/sharedComponentStyles'
+import { headerBlue, MOBILE } from '../styles/sharedComponentStyles'
 import friendsIcon from '../assets/friends.svg'
 import notificationsIcon from '../assets/notifications.svg'
 import notificationsPendingIcon from '../assets/notifications-pending.svg'
@@ -24,13 +25,28 @@ export function ChatIcon () {
 	)
 }
 
-export function Friends ({ showDropdown, setShowDropdown }) {
+export function Friends () {
+	const [showDropdown, setShowDropdown] = useState(false)
 	const { user, acceptFriendRequest, rejectFriendRequest } = useAuth()
-
 	const hasItems = user.incomingFriendRequests.length ? user.incomingFriendRequests.length : false
+
+	useEffect(() => {
+		function callback (e) {
+			if (!document.getElementById('friends-menu-item-container').contains(e.target)) {
+				setShowDropdown(false)
+			}
+		}
+		window.addEventListener('click', callback)
+		return () => window.removeEventListener('click', callback)
+	}, [])
+
 	return (
-		<MenuItemContainer onBlur={e => e.relatedTarget === null && setShowDropdown(false)}>
-			<button aria-label='Incoming friend requests' className='icon-button' onClick={setShowDropdown}>
+		<MenuItemContainer id='friends-menu-item-container'>
+			<button
+				className='icon-button'
+				aria-label='Incoming friend requests'
+				onClick={() => setShowDropdown(prev => !prev)}
+			>
 				<HeaderIcon src={friendsIcon} alt='' />
 				{hasItems && <span>{hasItems}</span>}
 			</button>
@@ -44,11 +60,19 @@ export function Friends ({ showDropdown, setShowDropdown }) {
 									<Link to={`/user/${requestingUser.id}`}>{requestingUser.fullname}</Link>
 									<span> sent you a friend request</span>
 								</p>
-								<div className= 'buttons'>
-									<ResponseButton onClick={() => acceptFriendRequest(requestingUser.id)} >
+								<div className='buttons'>
+									<ResponseButton onClick={() => {
+										if (user.incomingFriendRequests.length === 1) setShowDropdown(false)
+										acceptFriendRequest(requestingUser.id)}
+									}>
 										Accept
 									</ResponseButton>
-									<ResponseButton onClick={() => rejectFriendRequest(requestingUser.id)} className='reject'>
+									<ResponseButton
+										className='reject'
+										onClick={() => {
+											if (user.incomingFriendRequests.length === 1) setShowDropdown(false)
+											rejectFriendRequest(requestingUser.id)}
+										}>
 										Reject
 									</ResponseButton>
 								</div>
@@ -64,13 +88,28 @@ export function Friends ({ showDropdown, setShowDropdown }) {
 	)
 }
 
-export function Notifications ({ showDropdown, setShowDropdown }) {
+export function Notifications () {
+	const [showDropdown, setShowDropdown] = useState(false)
 	const { user, clearNotification } = useAuth()
-
 	const hasItems = user.notifications.length ? user.notifications.length : false
+
+	useEffect(() => {
+		function callback (e) {
+			if (!document.getElementById('notifications-menu-item-container').contains(e.target)) {
+				setShowDropdown(false)
+			}
+		}
+		window.addEventListener('click', callback)
+		return () => window.removeEventListener('click', callback)
+	}, [])
+
 	return (
-		<MenuItemContainer onBlur={e => e.relatedTarget === null && setShowDropdown(false)}>
-			<button aria-label='unread notifications' className='icon-button' onClick={setShowDropdown}>
+		<MenuItemContainer id='notifications-menu-item-container'>
+			<button
+				className='icon-button'
+				aria-label='unread notifications'
+				onClick={setShowDropdown}
+			>
 				<HeaderIcon src={hasItems ? notificationsPendingIcon : notificationsIcon} alt='' />
 				{hasItems && <span>{hasItems}</span>}
 			</button>
@@ -88,7 +127,12 @@ export function Notifications ({ showDropdown, setShowDropdown }) {
 									<span className='time'>{getTimeFrame(notification.createdAt)}</span>
 								</p>
 								<div className= 'buttons'>
-									<ResponseButton onClick={() => clearNotification(notification)}>
+									<ResponseButton
+										className='menu-item-dropdown-button'
+										onClick={() => {
+											if (user.notifications.length === 1) setShowDropdown(false)
+											clearNotification(notification)
+										}}>
 										Dismiss
 									</ResponseButton>
 								</div>
@@ -118,7 +162,8 @@ const MenuItemContainer = styled.div`
 const DropdownContainer = styled.div`
 	position: absolute;
 	top: 70px;
-	right: 20px;
+	right: -10px;
+	@media (max-width: ${MOBILE}) { right: 10px; }
 	border: 5px solid #222;
 	border-radius: 5px;
 	z-index: 1;
